@@ -1,0 +1,15 @@
+[package]
+name = "whichlang_trainer"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+codegen-units = 1
+
+[dependencies]
+tikv-jemallocator = { version = "0.5", features = ["background_threads", "unprefixed_malloc_on_supported_platforms"] }
+
+linfa = { version = "0.6", features = ["openblas-static"] }
+linfa-logistic = "0.6"
+linfa-preprocessing = "0.6"
+ndarray = "0.15"
