@@ -6,8 +6,7 @@ use std::{
 use linfa::prelude::*;
 use ndarray::prelude::*;
 
-use linfa_logistic::*;
-use linfa_preprocessing::norm_scaling::NormScaler;
+use linfa_bayes::*;
 
 #[global_allocator]
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
@@ -27,22 +26,20 @@ fn main() {
 
         let feature = line.next().unwrap();
 
-        let data = line.map(|v| v.parse::<u64>().unwrap() as f64);
+        let data = line.map(|v| v.parse::<u64>().unwrap() as f32);
         xs.extend(data);
 
         ys.push(feature.to_string());
     }
 
     let xs = Array2::from_shape_vec((xs.len() / 4096, 4096), xs).unwrap();
-    let scaller = NormScaler::l2();
-    let xs = scaller.transform(xs);
-
+    
     let ys = Array1::from_vec(ys);
     let dataset = DatasetBase::new(xs, ys);
 
     let (train, check) = dataset.split_with_ratio(0.8);
 
-    let model = MultiLogisticRegression::default().fit(&train).unwrap();
+    let model = MultinomialNbParams::new().fit(&train).unwrap();
     let pred = model.predict(&check);
     let cm = pred.confusion_matrix(&check).unwrap();
 
